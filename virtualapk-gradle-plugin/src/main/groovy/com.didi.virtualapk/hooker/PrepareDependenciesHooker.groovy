@@ -59,6 +59,9 @@ class PrepareDependenciesHooker extends GradleTaskHooker<AppPreBuildTask> {
     /**
      * Classify all dependencies into retainedAarLibs & retainedJarLib & stripDependencies
      *
+     * ImmutableMap<String, String> buildMapping = Reflect.on('com.android.build.gradle.internal.ide.ModelBuilder')
+     *               .call('computeBuildMapping', project.gradle)
+     *               .get()
      * @param task Gradle Task fo PrepareDependenciesTask
      */
     @Override
@@ -71,9 +74,7 @@ class PrepareDependenciesHooker extends GradleTaskHooker<AppPreBuildTask> {
         }
         Dependencies dependencies
         if (project.extensions.extraProperties.get(Constants.GRADLE_3_1_0)) {
-            ImmutableMap<String, String> buildMapping = Reflect.on('com.android.build.gradle.internal.ide.ModelBuilder')
-                    .call('computeBuildMapping', project.gradle)
-                    .get()
+            ImmutableMap<String, String> buildMapping = BuildMappingUtils.computeBuildMapping(project.getGradle())
             dependencies = new ArtifactDependencyGraph().createDependencies(scope, false, buildMapping, consumer)
         } else {
             dependencies = new ArtifactDependencyGraph().createDependencies(scope, false, consumer)
